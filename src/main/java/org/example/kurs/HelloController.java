@@ -22,8 +22,6 @@ public class HelloController {
     @FXML
     private Circle centre;
     @FXML
-    private Circle centre1;
-    @FXML
     private Circle consultant;
     @FXML
     private Circle cash;
@@ -69,11 +67,17 @@ public class HelloController {
 
 
         // Инициализация Habitat
-        habitat = new Habitat(pane, centre,entry, consultant, cash, exit);
+        habitat = new Habitat(pane, centre,entry, consultant, cash, exit,CountCash.getValue(), CountConsultant.getValue());
 
     // Создаем таймер для генерации покупателей
         customerGenerator = new Timeline(
-                new KeyFrame(Duration.seconds(getRandomPeriod()), e -> habitat.generateCustomer())
+                new KeyFrame(Duration.seconds(getRandomPeriod()), e -> {
+                    try {
+                        habitat.generateCustomer();
+                    } catch (InterruptedException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                })
         );
         customerGenerator.setCycleCount(Timeline.INDEFINITE); // Таймер бесконечный
     }
@@ -108,7 +112,13 @@ public class HelloController {
             customerGenerator.stop();
         }
         customerGenerator = new Timeline(
-                new KeyFrame(Duration.seconds(getRandomPeriod()), e -> habitat.generateCustomer())
+                new KeyFrame(Duration.seconds(getRandomPeriod()), e -> {
+                    try {
+                        habitat.generateCustomer();
+                    } catch (InterruptedException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                })
         );
         customerGenerator.setCycleCount(Timeline.INDEFINITE);
         customerGenerator.play();
