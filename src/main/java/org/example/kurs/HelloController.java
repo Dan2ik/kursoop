@@ -6,9 +6,11 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.TableView;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
 import javafx.util.Duration;
+import java.util.Timer;
 
 import java.util.Random;
 
@@ -31,6 +33,10 @@ public class HelloController {
     @FXML
     private Pane pane;
     @FXML
+    private TableView Cashmatrix;
+    @FXML
+    private TableView Consultantmatrix;
+    @FXML
     private Spinner<Integer> MaxQueueCash;       // Количество касс
     @FXML
     private Spinner<Integer> MaxQueueCons; // Количество консультантов
@@ -45,9 +51,6 @@ public class HelloController {
 
     private Timeline customerGenerator;
     private final Random random = new Random();
-
-
-
     @FXML
     public void initialize() {
         entryx = entry.getLayoutX();

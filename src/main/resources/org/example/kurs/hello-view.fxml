@@ -21,20 +21,20 @@
       <Circle fx:id="consultant" fill="WHITE" layoutX="573.0" layoutY="227.0" radius="9.0" stroke="BLACK" strokeType="INSIDE" />
       <Circle fx:id="cash" fill="WHITE" layoutX="171.0" layoutY="228.0" radius="9.0" stroke="BLACK" strokeType="INSIDE" />
       <Circle fx:id="exit" fill="WHITE" layoutX="371.0" layoutY="391.0" radius="9.0" stroke="BLACK" strokeType="INSIDE" />
-      <TableView layoutX="47.0" layoutY="245.0" prefHeight="200.0" prefWidth="200.0">
+      <TableView fx:id="Cashmatrix" layoutX="42.0" layoutY="245.0" prefHeight="200.0" prefWidth="257.0">
         <columns>
-          <TableColumn prefWidth="75.0" text="C1" />
-          <TableColumn prefWidth="75.0" text="C2" />
+          <TableColumn prefWidth="75.0" text="№ кассы" />
+          <TableColumn prefWidth="180.6666539510091" text="кол-во покупателей" />
         </columns>
       </TableView>
-      <TableView layoutX="513.0" layoutY="245.0" prefHeight="200.0" prefWidth="200.0">
+      <TableView fx:id="Consultantmatrix" layoutX="513.0" layoutY="245.0" prefHeight="200.0" prefWidth="257.0">
         <columns>
-          <TableColumn prefWidth="75.0" text="C1" />
-          <TableColumn prefWidth="75.0" text="C2" />
+          <TableColumn prefWidth="104.33331298828125" text="№ консультанта" />
+          <TableColumn prefWidth="151.33331298828125" text="кол-во покупателей" />
         </columns>
       </TableView>
       <Button layoutX="47.0" layoutY="737.0" mnemonicParsing="false" onAction="#start" text="Button" />
-      <Pane fx:id="pane" prefHeight="350.0" prefWidth="585.0" />
+      <Pane fx:id="pane" prefHeight="175.0" prefWidth="479.0" />
       <GridPane layoutX="47.0" layoutY="481.0" prefHeight="164.0" prefWidth="218.0">
         <columnConstraints>
           <ColumnConstraints hgrow="SOMETIMES" maxWidth="146.0" minWidth="10.0" prefWidth="146.0" />
