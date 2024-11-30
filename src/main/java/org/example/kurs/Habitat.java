@@ -15,7 +15,6 @@ import javafx.util.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
 public class Habitat {
     private final Pane pane; // Контейнер для добавления кругов
@@ -31,7 +30,9 @@ public class Habitat {
     private final List<CashRegister> cashRegisters;
     private final List<Consultant> consultants;
 
-    public Habitat(Pane pane, Circle centre, Circle entry, Circle consultant, Circle cash, Circle exit, int cashCount, int consultantCount) {
+    private final HelloController controller; // Ссылка на контроллер
+
+    public Habitat(Pane pane, Circle centre, Circle entry, Circle consultant, Circle cash, Circle exit, int cashCount, int consultantCount, int maxQueueCash, int maxQueueCons, HelloController controller) {
         this.pane = pane;
         this.centre = centre;
         this.entry = entry;
@@ -41,19 +42,20 @@ public class Habitat {
         this.customers = new ArrayList<>();
         this.cashRegisters = new ArrayList<>();
         this.consultants = new ArrayList<>();
+        this.controller = controller;
 
         // Создание касс и консультантов
         for (int i = 0; i < cashCount; i++) {
-            this.cashRegisters.add(new CashRegister(i + 1, 5)); // Максимальная длина очереди = 5
+            this.cashRegisters.add(new CashRegister(i + 1, maxQueueCash)); // Максимальная длина очереди
         }
 
         for (int i = 0; i < consultantCount; i++) {
-            this.consultants.add(new Consultant(i + 1, 5)); // Максимальная длина очереди = 5
+            this.consultants.add(new Consultant(i + 1, maxQueueCons)); // Максимальная длина очереди
         }
     }
 
     // Метод для генерации нового покупателя
-    public void generateCustomer() throws InterruptedException {
+    public void generateCustomer() {
         Circle customer = new Circle(10, Color.color(random.nextDouble(), random.nextDouble(), random.nextDouble()));
 
         pane.getChildren().add(customer); // Добавление на панель
@@ -67,80 +69,6 @@ public class Habitat {
     }
 
     // Метод для анимации движения покупателя
-    //waypoints.add(centre);
-    // waypoints.add(exit); // Выход
-    private void animateCustomertoexit(Circle customer, boolean choice) {
-        // Устанавливаем стартовые координаты покупателя
-
-        if (!pane.getChildren().contains(customer)) {
-            pane.getChildren().add(customer);
-        }
-
-        // Очистка текущей анимации
-        SequentialTransition sequentialTransition = new SequentialTransition();
-        sequentialTransition.getChildren().clear();
-
-        // Координаты ключевых точек
-        List<Circle> waypoints = new ArrayList<>();
-
-        waypoints.add(centre); // Центр
-         waypoints.add(exit); // Выход
-        if (choice) {
-            waypoints.add(consultant); // Консультант
-        } else {
-            waypoints.add(cash); // Касса
-        }
-        // Создание анимации пути
-        for (int i = 0; i < waypoints.size() - 1; i++) {
-            Circle currentPoint = waypoints.get(i);
-            Circle nextPoint = waypoints.get(i + 1);
-
-            Path path = new Path(
-                    new MoveTo(currentPoint.getLayoutX(), currentPoint.getLayoutY()),
-                    new LineTo(nextPoint.getLayoutX(), nextPoint.getLayoutY())
-            );
-            PathTransition pathTransition = new PathTransition();
-            pathTransition.setNode(customer);
-            pathTransition.setPath(path);
-            pathTransition.setDuration(Duration.seconds(2)); // Продолжительность перехода
-
-            sequentialTransition.getChildren().add(pathTransition);
-
-            // Пауза на ключевых точках
-            if (i == 0) {
-                PauseTransition pause = new PauseTransition(Duration.seconds(1)); // Пауза в центре
-                sequentialTransition.getChildren().add(pause);
-            }
-        }
-
-        // В момент нахождения клиента у консультанта или кассы
-        sequentialTransition.setOnFinished(e -> {
-            if (choice) {
-                // Выбираем консультанта и добавляем в его очередь
-                Consultant selectedConsultant = consultants.get(0); // Можно добавить логику для выбора консультанта
-                boolean added = selectedConsultant.addCustomer(customer);
-                selectedConsultant.assistCustomer();
-                if (!added) {
-                    System.out.println("Консультант " + selectedConsultant.getId() + " не смог принять клиента, очередь полна");
-                }
-            } else {
-                // Выбираем кассу и добавляем в её очередь
-                CashRegister selectedCashRegister = cashRegisters.get(0); // Можно добавить логику для выбора кассы
-                boolean added = selectedCashRegister.addCustomer(customer);
-                selectedCashRegister.serveCustomer();
-                if (!added) {
-                    System.out.println("Касса " + selectedCashRegister.getId() + " не смогла принять клиента, очередь полна");
-                }
-            }
-
-            // Удаляем клиента из панели после завершения анимации
-            pane.getChildren().remove(customer);
-        });
-
-        // Запускаем анимацию
-        sequentialTransition.play();
-    }
-
     private void animateCustomer(Circle customer, boolean choice) {
         if (!pane.getChildren().contains(customer)) {
             pane.getChildren().add(customer);
@@ -183,17 +111,51 @@ public class Habitat {
                 pathTransition.setOnFinished(e -> {
                     if (choice) {
                         // Работа с консультантом
-                        Consultant selectedConsultant = consultants.get(0); // Логика выбора консультанта
+                        Consultant selectedConsultant = null; // Логика выбора консультанта
+                        for (Consultant consultant : consultants) {
+                            if (consultant.getQueueSize() < consultant.getMaxQueueSize()) {
+                                selectedConsultant = consultant;
+                                break;  // Найден первый свободный консультант
+                            }
+                        }
+
+                        if (selectedConsultant != null) {
+                            boolean added = selectedConsultant.addCustomer(customer);
+                            selectedConsultant.assistCustomer();
+                            if (!added) {
+                                System.out.println("Консультант " + selectedConsultant.getId() + " не смог принять клиента, очередь полна");
+                            }
+                        } else {
+                            System.out.println("Нет свободных консультантов");
+                        }
                         boolean added = selectedConsultant.addCustomer(customer);
                         selectedConsultant.assistCustomer();
+                        controller.updateConsultantTable(selectedConsultant.getId(), selectedConsultant.getQueueSize());
                         if (!added) {
                             System.out.println("Консультант " + selectedConsultant.getId() + " не смог принять клиента, очередь полна");
                         }
                     } else {
                         // Работа с кассой
-                        CashRegister selectedCashRegister = cashRegisters.get(0); // Логика выбора кассы
+                        CashRegister selectedCashRegister = null;
+                        for (CashRegister cashRegister : cashRegisters) {
+                            if (cashRegister.getQueueSize() < cashRegister.getMaxQueueSize()) {
+                                selectedCashRegister = cashRegister;
+                                break;  // Найдена первая свободная касса
+                            }
+                        }
+
+                        if (selectedCashRegister != null) {
+                            boolean added = selectedCashRegister.addCustomer(customer);
+                            selectedCashRegister.serveCustomer();
+                            if (!added) {
+                                System.out.println("Касса " + selectedCashRegister.getId() + " не смогла принять клиента, очередь полна");
+                            }
+                        } else {
+                            System.out.println("Нет свободных касс");
+                        }
                         boolean added = selectedCashRegister.addCustomer(customer);
                         selectedCashRegister.serveCustomer();
+                        controller.updateCashTable(selectedCashRegister.getId(), selectedCashRegister.getQueueSize());
                         if (!added) {
                             System.out.println("Касса " + selectedCashRegister.getId() + " не смогла принять клиента, очередь полна");
                         }
@@ -218,8 +180,6 @@ public class Habitat {
         sequentialTransition.play();
     }
 
-
-
     // Метод для обновления параметров симуляции
     public void updateParameters(int cashCount, int consultantCount) {
         this.cashRegisters.clear();
@@ -227,14 +187,13 @@ public class Habitat {
 
         // Создание нового количества касс и консультантов
         for (int i = 0; i < cashCount; i++) {
-            this.cashRegisters.add(new CashRegister(i + 1, 5)); // Максимальная длина очереди = 5
+            this.cashRegisters.add(new CashRegister(i + 1, 5)); // Максимальная длина очереди
         }
 
         for (int i = 0; i < consultantCount; i++) {
-            this.consultants.add(new Consultant(i + 1, 5)); // Максимальная длина очереди = 5
+            this.consultants.add(new Consultant(i + 1, 5)); // Максимальная длина очереди
         }
     }
-
 
     // Метод для получения всех покупателей
     public List<Circle> getCustomers() {

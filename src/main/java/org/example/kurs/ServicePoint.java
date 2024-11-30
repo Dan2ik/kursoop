@@ -37,13 +37,13 @@ public abstract class ServicePoint {
             if (customer != null) {
                 isBusy = true; // Устанавливаем статус занятости
                 int serviceTime = random.nextInt(5) + 1; // Случайное время обслуживания (1-5 секунд)
-                System.out.println("Сервис " + id + " обслуживает клиента в течение " + serviceTime + " секунд. Осталось в очереди: " + queue.size());
+                System.out.println("Точка обслуживания" + id + " обслуживает клиента в течение " + serviceTime + " секунд. Осталось в очереди: " + queue.size());
 
                 // Используем PauseTransition для имитации времени обслуживания
                 PauseTransition pause = new PauseTransition(Duration.seconds(serviceTime));
                 pause.setOnFinished(e -> {
                     isBusy = false; // Освобождаем сервис
-                    System.out.println("Сервис " + id + " завершил обслуживание клиента. Очередь: " + queue.size());
+                    System.out.println("Точка обслуживания" + id + " завершил обслуживание клиента. Очередь: " + queue.size());
                     processNextCustomer(); // Переход к следующему клиенту
                 });
                 pause.play();
