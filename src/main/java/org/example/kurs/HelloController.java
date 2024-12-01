@@ -82,8 +82,7 @@ public class HelloController {
         MaxQueueCons.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 10, 1));
         MaxQueueCash.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 10, 1));
 
-        // Инициализация Habitat
-        habitat = new Habitat(pane, centre, entry, consultant, cash, exit, CountCash.getValue(), CountConsultant.getValue(), MaxQueueCash.getValue(), MaxQueueCons.getValue(), this);
+
 
         // Создание таймера для генерации покупателей
         customerGenerator = new Timeline(
@@ -98,6 +97,8 @@ public class HelloController {
 
     // Запуск симуляции
     public void start(ActionEvent actionEvent) {
+        // Инициализация Habitat
+        habitat = new Habitat(pane, centre, entry, consultant, cash, exit, CountCash.getValue(), CountConsultant.getValue(), MaxQueueCash.getValue(), MaxQueueCons.getValue(), this);
         customerGenerator.play();
     }
 

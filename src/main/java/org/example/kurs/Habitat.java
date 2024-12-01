@@ -47,6 +47,7 @@ public class Habitat {
         // Создание касс и консультантов
         for (int i = 0; i < cashCount; i++) {
             this.cashRegisters.add(new CashRegister(i + 1, maxQueueCash)); // Максимальная длина очереди
+            System.out.println(cashCount);
         }
 
         for (int i = 0; i < consultantCount; i++) {
@@ -111,17 +112,20 @@ public class Habitat {
                 pathTransition.setOnFinished(e -> {
                     if (choice) {
                         // Работа с консультантом
+                        int g=0;
                         Consultant selectedConsultant = null; // Логика выбора консультанта
                         for (Consultant consultant : consultants) {
                             if (consultant.getQueueSize() < consultant.getMaxQueueSize()) {
                                 selectedConsultant = consultant;
                                 break;  // Найден первый свободный консультант
                             }
-                        }
+                            g++;
 
+                        }
                         if (selectedConsultant != null) {
                             boolean added = selectedConsultant.addCustomer(customer);
                             selectedConsultant.assistCustomer();
+                            controller.updateConsultantTable(selectedConsultant.getId(),selectedConsultant.getQueueSize());
                             if (!added) {
                                 System.out.println("Консультант " + selectedConsultant.getId() + " не смог принять клиента, очередь полна");
                             }
@@ -147,6 +151,7 @@ public class Habitat {
                         if (selectedCashRegister != null) {
                             boolean added = selectedCashRegister.addCustomer(customer);
                             selectedCashRegister.serveCustomer();
+                            controller.updateCashTable(selectedCashRegister.getId(), selectedCashRegister.getQueueSize());
                             if (!added) {
                                 System.out.println("Касса " + selectedCashRegister.getId() + " не смогла принять клиента, очередь полна");
                             }

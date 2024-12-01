@@ -41,10 +41,10 @@
             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Кол-во консультантов:" GridPane.rowIndex="1" />
             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Миниамальный период генерации покупателей:" wrappingWidth="136.1875" GridPane.rowIndex="2" />
             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Максимальный период генерации покупателей:" wrappingWidth="136.1875" GridPane.rowIndex="3" />
-             <Spinner fx:id="CountCash" onMouseClicked="#updateSimulationParameters" GridPane.columnIndex="1" />
-             <Spinner fx:id="CountConsultant" onMouseClicked="#updateSimulationParameters" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-             <Spinner fx:id="MinPeriod" onMouseClicked="#updateSimulationParameters" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-             <Spinner fx:id="MaxPeriod" onMouseClicked="#updateSimulationParameters" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+             <Spinner fx:id="CountCash" GridPane.columnIndex="1" />
+             <Spinner fx:id="CountConsultant" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+             <Spinner fx:id="MinPeriod" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+             <Spinner fx:id="MaxPeriod" GridPane.columnIndex="1" GridPane.rowIndex="3" />
          </children>
       </GridPane>
       <GridPane layoutX="286.0" layoutY="481.0" prefHeight="164.0" prefWidth="226.0">
