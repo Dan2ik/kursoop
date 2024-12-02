@@ -46,7 +46,7 @@ public abstract class ServicePoint {
             Circle customer = queue.dequeue(); // Извлечение клиента из очереди
             if (customer != null) {
                 isBusy = true; // Устанавливаем статус занятости
-                int serviceTime = random.nextInt(10) + 1; // Случайное время обслуживания (1-10 секунд)
+                int serviceTime = (int) (random.nextInt(10) + 1/Clock.getSpeed()); // Случайное время обслуживания (1-10 секунд)
                 System.out.println("Точка обслуживания " + id + " обслуживает клиента в течение " + serviceTime + " секунд. Осталось в очереди: " + queue.size());
 
                 // Используем PauseTransition для имитации времени обслуживания

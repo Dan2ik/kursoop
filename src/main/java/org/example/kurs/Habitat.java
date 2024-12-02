@@ -105,7 +105,7 @@ public class Habitat {
             PathTransition pathTransition = new PathTransition();
             pathTransition.setNode(customer);
             pathTransition.setPath(path);
-            pathTransition.setDuration(Duration.seconds(2)); // Продолжительность перехода
+            pathTransition.setDuration(Duration.seconds(2/Clock.getSpeed())); // Продолжительность перехода
 
             sequentialTransition.getChildren().add(pathTransition);
             if ((choice && nextPoint == consultant) || (!choice && nextPoint == cash)) {

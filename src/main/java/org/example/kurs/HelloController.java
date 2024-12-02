@@ -8,16 +8,14 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.SpinnerValueFactory;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
 import javafx.util.Duration;
 
+import java.time.LocalTime;
 import java.util.Random;
 
 public class HelloController {
@@ -44,11 +42,36 @@ public class HelloController {
 
     private ObservableList<ServiceTableEntry> cashTableData;
     private ObservableList<ServiceTableEntry> consultantTableData;
+    private final Clock clock = new Clock(LocalTime.of(8, 0, 0)); // Начало в 08:00
+    @FXML
+    private Label timeLabel;  // Метка для отображения времени
+
+    @FXML
+    private Slider speedSlider;  // Слайдер для управления скоростью
 
     private Habitat habitat;
 
     @FXML
     public void initialize() {
+
+        // Обновляем метку каждую секунду
+        Timeline updateLabelTimeline = new Timeline(new KeyFrame(Duration.millis(100), e -> {
+            timeLabel.setText(clock.getCurrentTime());
+        }));
+        updateLabelTimeline.setCycleCount(Timeline.INDEFINITE);
+        updateLabelTimeline.play();
+
+        // Настраиваем слайдер для управления скоростью
+        speedSlider.setMin(0.1);  // Минимальная скорость (0.1x)
+        speedSlider.setMax(1000.0); // Максимальная скорость (10x)
+        speedSlider.setValue(1.0); // По умолчанию 1x
+        // Слушатель изменения скорости
+        speedSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            clock.setSpeed(newValue.doubleValue());
+        });
+
+        // Запускаем часы
+        clock.start();
         // Инициализация данных таблиц
         cashTableData = FXCollections.observableArrayList();
         consultantTableData = FXCollections.observableArrayList();
