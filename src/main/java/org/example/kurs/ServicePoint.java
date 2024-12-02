@@ -12,6 +12,7 @@ public abstract class ServicePoint {
     private boolean isBusy;           // Статус занятости
     private final Random random;      // Генератор случайных чисел
     private final HelloController controller; // Ссылка на контроллер
+    private int notserved=0;
 
     public ServicePoint(int id, int maxQueueSize, HelloController controller) {
         this.id = id;
@@ -27,6 +28,10 @@ public abstract class ServicePoint {
             queue.enqueue(customer); // Добавление клиента в очередь
             System.out.println("Клиент добавлен в очередь сервиса " + id + ". Очередь: " + queue.size());
             return true; // Клиент успешно добавлен в очередь
+        }
+        else {
+            notserved++;
+            System.out.println(notserved);
         }
         System.out.println("Очередь сервиса " + id + " заполнена. Клиент не может быть добавлен.");
         return false; // Если очередь полна, возвращаем false
