@@ -29,7 +29,10 @@ public class Queue<T> {
         }
         return elements.removeFirst();
     }
-
+    // Метод для удаления конкретного элемента
+    public boolean remove(T item) {
+        return elements.remove(item);
+    }
     // Просмотр первого элемента без удаления
     public T peek() {
         if (isEmpty()) {

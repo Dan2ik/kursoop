@@ -129,6 +129,10 @@ public class Habitat {
                             if (!added) {
                                 System.out.println("Консультант " + selectedConsultant.getId() + " не смог принять клиента, очередь полна");
                             }
+                            // Удаление клиента после обслуживания
+                            selectedConsultant.removeFromQueue(customer);  // Удалить клиента из очереди
+                            customers.remove(customer);            // Удалить клиента из списка
+                            controller.updateConsultantTable(selectedConsultant.getId(), selectedConsultant.getQueueSize()); // Обновить таблицу
                         } else {
                             System.out.println("Нет свободных консультантов");
                         }

@@ -36,7 +36,7 @@ public abstract class ServicePoint {
             Circle customer = queue.dequeue(); // Извлечение клиента из очереди
             if (customer != null) {
                 isBusy = true; // Устанавливаем статус занятости
-                int serviceTime = random.nextInt(5) + 1; // Случайное время обслуживания (1-5 секунд)
+                int serviceTime = random.nextInt(10) + 1; // Случайное время обслуживания (1-5 секунд)
                 System.out.println("Точка обслуживания" + id + " обслуживает клиента в течение " + serviceTime + " секунд. Осталось в очереди: " + queue.size());
 
                 // Используем PauseTransition для имитации времени обслуживания
@@ -44,6 +44,8 @@ public abstract class ServicePoint {
                 pause.setOnFinished(e -> {
                     isBusy = false; // Освобождаем сервис
                     System.out.println("Точка обслуживания" + id + " завершил обслуживание клиента. Очередь: " + queue.size());
+                    this.removeFromQueue(customer);
+
                     processNextCustomer(); // Переход к следующему клиенту
                 });
                 pause.play();
@@ -66,6 +68,9 @@ public abstract class ServicePoint {
     public int getId() {
         return id;  // Идентификатор сервиса
     }
+    public void removeFromQueue(Circle customer) {
+        queue.remove(customer);  // Удаляем клиента из очереди
+    }
 }
 
 class Consultant extends ServicePoint {
@@ -83,6 +88,7 @@ class Consultant extends ServicePoint {
         }
     }
 }
+
 
 class CashRegister extends ServicePoint {
     public CashRegister(int id, int maxQueueSize) {
