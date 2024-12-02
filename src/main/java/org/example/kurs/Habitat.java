@@ -46,12 +46,12 @@ public class Habitat {
 
         // Создание касс и консультантов
         for (int i = 0; i < cashCount; i++) {
-            this.cashRegisters.add(new CashRegister(i + 1, maxQueueCash)); // Максимальная длина очереди
+            this.cashRegisters.add(new CashRegister(i + 1, maxQueueCash, controller)); // Максимальная длина очереди
             System.out.println(cashCount);
         }
 
         for (int i = 0; i < consultantCount; i++) {
-            this.consultants.add(new Consultant(i + 1, maxQueueCons)); // Максимальная длина очереди
+            this.consultants.add(new Consultant(i + 1, maxQueueCons, controller)); // Максимальная длина очереди
         }
     }
 
@@ -112,15 +112,12 @@ public class Habitat {
                 pathTransition.setOnFinished(e -> {
                     if (choice) {
                         // Работа с консультантом
-                        int g=0;
                         Consultant selectedConsultant = null; // Логика выбора консультанта
                         for (Consultant consultant : consultants) {
                             if (consultant.getQueueSize() < consultant.getMaxQueueSize()) {
                                 selectedConsultant = consultant;
                                 break;  // Найден первый свободный консультант
                             }
-                            g++;
-
                         }
                         if (selectedConsultant != null) {
                             boolean added = selectedConsultant.addCustomer(customer);
@@ -196,11 +193,11 @@ public class Habitat {
 
         // Создание нового количества касс и консультантов
         for (int i = 0; i < cashCount; i++) {
-            this.cashRegisters.add(new CashRegister(i + 1, 5)); // Максимальная длина очереди
+            this.cashRegisters.add(new CashRegister(i + 1, 5, controller)); // Максимальная длина очереди
         }
 
         for (int i = 0; i < consultantCount; i++) {
-            this.consultants.add(new Consultant(i + 1, 5)); // Максимальная длина очереди
+            this.consultants.add(new Consultant(i + 1, 5, controller)); // Максимальная длина очереди
         }
     }
 
