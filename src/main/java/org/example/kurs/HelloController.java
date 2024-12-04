@@ -14,9 +14,9 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
 import javafx.util.Duration;
 
+import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.Random;
 
@@ -47,7 +47,8 @@ public class HelloController {
 
     private ObservableList<ServiceTableEntry> cashTableData;
     private ObservableList<ServiceTableEntry> consultantTableData;
-    private final Clock clock = new Clock(LocalTime.of(8, 0, 0)); // Начало в 08:00
+    private  Clock clock = new Clock(LocalTime.of(8, 0, 0), DayOfWeek.MONDAY); // Начало в 08:00
+    private final Schedule schedule= new Schedule(false);
     @FXML
     private Label timeLabel;  // Метка для отображения времени
 
@@ -60,12 +61,10 @@ public class HelloController {
     @FXML
     public void initialize() {
 
-        // Обновляем метку каждую секунду
-
-
+        // Обновляем метку каждую секунд
         // Настраиваем слайдер для управления скоростью
         speedSlider.setMin(0.1);  // Минимальная скорость (0.1x)
-        speedSlider.setMax(1000.0); // Максимальная скорость (10x)
+        speedSlider.setMax(100.0); // Максимальная скорость (10x)
         speedSlider.setValue(1.0); // По умолчанию 1x
         // Слушатель изменения скорости
         speedSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -123,6 +122,7 @@ public class HelloController {
 
     // Запуск симуляции
     public void start(ActionEvent actionEvent) {
+        if(schedule.isOpen(clock.getCurrentDay().getValue(), clock.getHour().getHour())){
         Timeline updateLabelTimeline = new Timeline(new KeyFrame(Duration.millis(100), e -> {
             timeLabel.setText(clock.getCurrentTime());
         }));
@@ -131,6 +131,7 @@ public class HelloController {
         // Инициализация Habitat
         habitat = new Habitat(pane, centre, entry, consultant, cash, exit, CountCash.getValue(), CountConsultant.getValue(), MaxQueueCash.getValue(), MaxQueueCons.getValue(), this);
         customerGenerator.play();
+        }
     }
 
     // Остановка симуляции
