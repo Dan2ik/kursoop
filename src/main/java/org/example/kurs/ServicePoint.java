@@ -31,7 +31,6 @@ public abstract class ServicePoint {
         }
         else {
             notserved++;
-            System.out.println(notserved);
         }
         System.out.println("Очередь сервиса " + id + " заполнена. Клиент не может быть добавлен.");
         return false; // Если очередь полна, возвращаем false

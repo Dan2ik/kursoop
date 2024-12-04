@@ -26,6 +26,7 @@ public class Habitat {
     private final List<Circle> customers; // Список всех покупателей
     private final Random random = new Random();
     private boolean choice;
+    private int unservedCustomerCount;
 
     private final List<CashRegister> cashRegisters;
     private final List<Consultant> consultants;
@@ -43,6 +44,7 @@ public class Habitat {
         this.cashRegisters = new ArrayList<>();
         this.consultants = new ArrayList<>();
         this.controller = controller;
+        this.unservedCustomerCount =0;
 
         // Создание касс и консультантов
         for (int i = 0; i < cashCount; i++) {
@@ -125,13 +127,16 @@ public class Habitat {
                             controller.updateConsultantTable(selectedConsultant.getId(),selectedConsultant.getQueueSize());
                             if (!added) {
                                 System.out.println("Консультант " + selectedConsultant.getId() + " не смог принять клиента, очередь полна");
+                                unservedCustomerCount++;  // Увеличиваем счетчик необслуженных клиентов
                             }
+
                             // Удаление клиента после обслуживания
                             selectedConsultant.removeFromQueue(customer);  // Удалить клиента из очереди
                             customers.remove(customer);            // Удалить клиента из списка
                             controller.updateConsultantTable(selectedConsultant.getId(), selectedConsultant.getQueueSize()); // Обновить таблицу
                         } else {
                             System.out.println("Нет свободных консультантов");
+                            unservedCustomerCount++;
                         }
                         boolean added = selectedConsultant.addCustomer(customer);
                         selectedConsultant.assistCustomer();
@@ -155,9 +160,11 @@ public class Habitat {
                             controller.updateCashTable(selectedCashRegister.getId(), selectedCashRegister.getQueueSize());
                             if (!added) {
                                 System.out.println("Касса " + selectedCashRegister.getId() + " не смогла принять клиента, очередь полна");
+                                unservedCustomerCount++;
                             }
                         } else {
                             System.out.println("Нет свободных касс");
+                            unservedCustomerCount++;
                         }
                         boolean added = selectedCashRegister.addCustomer(customer);
                         selectedCashRegister.serveCustomer();
@@ -166,7 +173,9 @@ public class Habitat {
                             System.out.println("Касса " + selectedCashRegister.getId() + " не смогла принять клиента, очередь полна");
                         }
                     }
+                    controller.updateNotServed(unservedCustomerCount);
                 });
+
             }
 
             // Добавляем паузу на ключевых точках

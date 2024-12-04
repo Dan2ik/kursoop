@@ -13,6 +13,8 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import javafx.util.Duration;
 
 import java.time.LocalTime;
@@ -28,7 +30,10 @@ public class HelloController {
 
     @FXML
     private Pane pane;
-
+    @FXML
+    private Text CountAll;
+    @FXML
+    private Text CountNotServed;
     @FXML
     private TableView<ServiceTableEntry> Cashmatrix; // Таблица для касс
     @FXML
@@ -50,16 +55,13 @@ public class HelloController {
     private Slider speedSlider;  // Слайдер для управления скоростью
 
     private Habitat habitat;
+    private int CountCustomers;
 
     @FXML
     public void initialize() {
 
         // Обновляем метку каждую секунду
-        Timeline updateLabelTimeline = new Timeline(new KeyFrame(Duration.millis(100), e -> {
-            timeLabel.setText(clock.getCurrentTime());
-        }));
-        updateLabelTimeline.setCycleCount(Timeline.INDEFINITE);
-        updateLabelTimeline.play();
+
 
         // Настраиваем слайдер для управления скоростью
         speedSlider.setMin(0.1);  // Минимальная скорость (0.1x)
@@ -109,9 +111,10 @@ public class HelloController {
 
         // Создание таймера для генерации покупателей
         customerGenerator = new Timeline(
-                new KeyFrame(Duration.seconds(getRandomPeriod()), e -> {
-
-                        habitat.generateCustomer();
+                new KeyFrame(Duration.seconds(getRandomPeriod()/speedSlider.getValue()), e -> {
+                    CountCustomers++;
+                    CountAll.setText(String.valueOf(CountCustomers));
+                    habitat.generateCustomer();
 
                 })
         );
@@ -120,6 +123,11 @@ public class HelloController {
 
     // Запуск симуляции
     public void start(ActionEvent actionEvent) {
+        Timeline updateLabelTimeline = new Timeline(new KeyFrame(Duration.millis(100), e -> {
+            timeLabel.setText(clock.getCurrentTime());
+        }));
+        updateLabelTimeline.setCycleCount(Timeline.INDEFINITE);
+        updateLabelTimeline.play();
         // Инициализация Habitat
         habitat = new Habitat(pane, centre, entry, consultant, cash, exit, CountCash.getValue(), CountConsultant.getValue(), MaxQueueCash.getValue(), MaxQueueCons.getValue(), this);
         customerGenerator.play();
@@ -181,6 +189,9 @@ public class HelloController {
         }
     }
 
+    public void updateNotServed(int a) {
+        CountNotServed.setText(String.valueOf(a));
+    }
     // Обновление таблицы касс
     public void updateCashTable(int cashId, int queueSize) {
         for (ServiceTableEntry entry : cashTableData) {
