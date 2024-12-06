@@ -31,7 +31,15 @@ public class HelloController {
     @FXML
     private Pane pane;
     @FXML
+    private CheckBox IsSuper;
+    @FXML
+    private CheckBox ad;
+    @FXML
+    private CheckBox discount;
+    @FXML
     private Text CountAll;
+    @FXML
+    private Text Money;
     @FXML
     private Text CountNotServed;
     @FXML
@@ -48,7 +56,7 @@ public class HelloController {
     private ObservableList<ServiceTableEntry> cashTableData;
     private ObservableList<ServiceTableEntry> consultantTableData;
     private  Clock clock = new Clock(LocalTime.of(8, 0, 0), DayOfWeek.MONDAY); // Начало в 08:00
-    private final Schedule schedule= new Schedule(false);
+    private  Schedule schedule;
     @FXML
     private Label timeLabel;  // Метка для отображения времени
 
@@ -57,10 +65,14 @@ public class HelloController {
 
     private Habitat habitat;
     private int CountCustomers;
+    private int Ad, Discount;
+
 
     @FXML
     public void initialize() {
-
+        schedule = new Schedule(IsSuper.isSelected());
+        Ad = ad.isSelected() ? 1 : 0;
+        Discount = discount.isSelected() ? 1 : 0;
         // Обновляем метку каждую секунд
         // Настраиваем слайдер для управления скоростью
         speedSlider.setMin(0.1);  // Минимальная скорость (0.1x)
@@ -107,24 +119,33 @@ public class HelloController {
         MaxQueueCash.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 10, 1));
 
 
-
         // Создание таймера для генерации покупателей
         customerGenerator = new Timeline(
-                new KeyFrame(Duration.seconds(getRandomPeriod()/speedSlider.getValue()), e -> {
-                    CountCustomers++;
-                    CountAll.setText(String.valueOf(CountCustomers));
-                    habitat.generateCustomer();
+                new KeyFrame(Duration.seconds(getRandomPeriod()), e -> {
+                    System.out.println("День недели: "+ clock.getCurrentDay().getValue()+ "Час: "+clock.getHour().getHour());
+
+                    if(schedule.isOpen(clock.getCurrentDay().getValue(), clock.getHour().getHour())) {
+
+
+                        CountCustomers++;
+                        CountAll.setText(String.valueOf(CountCustomers));
+                        habitat.generateCustomer();
+                    }
 
                 })
         );
         customerGenerator.setCycleCount(Timeline.INDEFINITE);
+
     }
+
 
     // Запуск симуляции
     public void start(ActionEvent actionEvent) {
         if(schedule.isOpen(clock.getCurrentDay().getValue(), clock.getHour().getHour())){
         Timeline updateLabelTimeline = new Timeline(new KeyFrame(Duration.millis(100), e -> {
-            timeLabel.setText(clock.getCurrentTime());
+            String timeText = clock.getCurrentTime();
+            String dayText = clock.getCurrentDay().toString();
+            timeLabel.setText("Время: " + timeText + " | День недели: " + dayText);
         }));
         updateLabelTimeline.setCycleCount(Timeline.INDEFINITE);
         updateLabelTimeline.play();
@@ -134,6 +155,9 @@ public class HelloController {
         }
     }
 
+    public int workers(){
+        return CountCash.getValue()+ CountConsultant.getValue();
+    }
     // Остановка симуляции
     public void stop(ActionEvent actionEvent) {
         customerGenerator.stop();
@@ -157,7 +181,10 @@ public class HelloController {
     private double getRandomPeriod() {
         int min = MinPeriod.getValue();
         int max = MaxPeriod.getValue();
-        return min + (max - min) * random.nextDouble();
+        double a;
+        a = (((min + (max - min) * random.nextDouble()) / speedSlider.getValue()) + 0.1 * Ad * ((min + (max - min) * random.nextDouble()) / speedSlider.getValue()) + 0.005 * Discount * ((min + (max - min) * random.nextDouble()) / speedSlider.getValue()));
+
+        return a;
     }
 
     public void updateSimulationParameters(MouseEvent mouseEvent) {
@@ -213,5 +240,8 @@ public class HelloController {
             }
         }
         consultantTableData.add(new ServiceTableEntry(consultantId, queueSize));
+    }
+    public void updateMoney(String s){
+        Money.setText(s);
     }
 }

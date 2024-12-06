@@ -5,7 +5,7 @@
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="776.0" prefWidth="1132.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.kurs.HelloController">
+<AnchorPane fx:id="date" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="776.0" prefWidth="1132.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.kurs.HelloController">
    <children>
       <Line endX="-100.0" endY="159.6666717529297" layoutX="471.0" layoutY="68.0" startX="-100.0" />
       <Line endX="100.0" layoutX="271.0" layoutY="228.0" startX="-100.0" />
@@ -68,7 +68,7 @@
             <Spinner fx:id="MaxQueueCons" onMouseClicked="#updateSimulationParameters" GridPane.columnIndex="1" GridPane.rowIndex="1" />
             <Slider fx:id="speedSlider" prefHeight="14.0" prefWidth="66.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Скорость анимации" wrappingWidth="145.10546875" GridPane.rowIndex="2" />
-            <CheckBox mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <CheckBox fx:id="IsSuper" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="3" />
             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Супермаркет:" GridPane.rowIndex="3" />
          </children>
       </GridPane>
@@ -83,10 +83,12 @@
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Количество покупателей" />
-            <Text fx:id="CountAll" strokeType="OUTSIDE" strokeWidth="0.0" text="0" GridPane.columnIndex="1" />
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Количество необслуженных покупателей" GridPane.rowIndex="1" />
-            <Text fx:id="CountNotServed" strokeType="OUTSIDE" strokeWidth="0.0" text="0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Количество покупателей" GridPane.rowIndex="1" />
+            <Text fx:id="CountAll" strokeType="OUTSIDE" strokeWidth="0.0" text="0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Количество необслуженных покупателей" GridPane.rowIndex="2" />
+            <Text fx:id="CountNotServed" strokeType="OUTSIDE" strokeWidth="0.0" text="0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <Label fx:id="date" />
+            <Text fx:id="Money" strokeType="OUTSIDE" strokeWidth="0.0" text="0" wrappingWidth="83.0" />
          </children>
       </GridPane>
       <GridPane layoutX="541.0" layoutY="481.0" prefHeight="117.0" prefWidth="200.0">
@@ -102,8 +104,8 @@
          <children>
             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Реклама :" />
             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Скидки:" GridPane.rowIndex="1" />
-            <CheckBox mnemonicParsing="false" GridPane.columnIndex="1" />
-            <CheckBox mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <CheckBox fx:id="ad" mnemonicParsing="false" GridPane.columnIndex="1" />
+            <CheckBox fx:id="discount" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
          </children>
       </GridPane>
    </children>

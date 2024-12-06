@@ -7,11 +7,6 @@ public class Schedule {
         this.isSupermarket = isSupermarket;
     }
 
-    /**
-     * Проверяет, открыт ли магазин в текущее время симуляции.
-     *
-     * @return true, если магазин открыт, иначе false.
-     */
     public boolean isOpen(int currentDay, int currentHour) {
         if (isSupermarket) {
             return true; // Супермаркет всегда открыт.

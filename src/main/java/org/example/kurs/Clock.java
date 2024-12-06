@@ -14,6 +14,7 @@ public class Clock {
     private final DateTimeFormatter formatter; // Формат времени
     private final Timeline timeline;           // Анимация для обновления времени
     public static double speed = 1.0;          // Скорость (1x по умолчанию)
+    private Runnable onNewDayCallback;
 
     public Clock(LocalTime startTime, DayOfWeek startDay) {
         this.currentTime = startTime;
@@ -26,6 +27,19 @@ public class Clock {
 
     // Метод запуска часов
     public void start() {
+        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1 / speed), e -> {
+            currentTime = currentTime.plusMinutes(1);
+            if (currentTime.equals(LocalTime.MIDNIGHT)) {
+                currentDay = currentDay.plus(1);
+                if (currentDay.getValue() > 7) {
+                    currentDay = DayOfWeek.MONDAY;
+                }
+                if (onNewDayCallback != null) {
+                    onNewDayCallback.run();
+                }
+            }
+        }));
+        timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
     }
 
@@ -66,6 +80,9 @@ public class Clock {
     // Получить текущий день недели
     public DayOfWeek getCurrentDay() {
         return currentDay;
+    }
+    public void setOnNewDay(Runnable callback) {
+        this.onNewDayCallback = callback;
     }
 
     public LocalTime getHour() {

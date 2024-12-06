@@ -4,22 +4,26 @@ import javafx.animation.PauseTransition;
 import javafx.scene.shape.Circle;
 import javafx.util.Duration;
 
+import java.time.DayOfWeek;
 import java.util.Random;
 
 public abstract class ServicePoint {
     private final Queue<Circle> queue; // Очередь клиентов
     private final int id;             // Идентификатор сервиса
     private boolean isBusy;           // Статус занятости
-    private final Random random;      // Генератор случайных чисел
+    private static Random random = new Random();
     private final HelloController controller; // Ссылка на контроллер
     private int notserved=0;
 
-    public ServicePoint(int id, int maxQueueSize, HelloController controller) {
+    private Bank bank;
+
+    public ServicePoint(int id, int maxQueueSize, HelloController controller, Bank bank) {
         this.id = id;
         this.queue = new Queue<>(maxQueueSize); // Использование вашего класса Queue
         this.controller = controller;
         this.isBusy = false;
         this.random = new Random();            // Инициализация генератора случайных чисел
+        this.bank = bank; // Инициализация объекта bank
     }
 
     // Метод для добавления клиента в очередь
@@ -50,15 +54,30 @@ public abstract class ServicePoint {
 
                 // Используем PauseTransition для имитации времени обслуживания
                 PauseTransition pause = new PauseTransition(Duration.seconds(serviceTime));
+                controller.updateCashTable(id, queue.size());
                 pause.setOnFinished(e -> {
                     isBusy = false; // Освобождаем сервис
+
                     System.out.println("Точка обслуживания " + id + " завершила обслуживание клиента. Очередь: " + queue.size());
                     controller.updateCashTable(id, queue.size());
+
+                    // Добавляем деньги в бюджет только на кассе
+                    if (this instanceof CashRegister && bank != null) {
+                        bank.deposit(getRandomValue());
+                    }
+                    controller.updateMoney(bank.toString());
+
                     processNextCustomer(); // Переход к следующему клиенту
                 });
                 pause.play();
             }
         }
+    }
+    public static double getRandomValue() {
+        double min = 30;
+        double max = 9000;
+        // Generate a random value between min and max
+        return   Math.round((random.nextDouble() * (max - min) + min) * 100.0) / 100.0;
     }
 
     public boolean isBusy() {
@@ -79,8 +98,8 @@ public abstract class ServicePoint {
 }
 
 class Consultant extends ServicePoint {
-    public Consultant(int id, int maxQueueSize, HelloController controller) {
-        super(id, maxQueueSize, controller); // Вызов конструктора родительского класса
+    public Consultant(int id, int maxQueueSize, HelloController controller, Bank bank) {
+        super(id, maxQueueSize, controller, bank); // Вызов конструктора родительского класса
     }
 
     // Метод для обслуживания следующего клиента в очереди
@@ -95,8 +114,8 @@ class Consultant extends ServicePoint {
 }
 
 class CashRegister extends ServicePoint {
-    public CashRegister(int id, int maxQueueSize, HelloController controller) {
-        super(id, maxQueueSize, controller); // Вызов конструктора родительского класса
+    public CashRegister(int id, int maxQueueSize, HelloController controller, Bank bank) {
+        super(id, maxQueueSize, controller, bank); // Вызов конструктора родительского класса
     }
 
     // Метод для обслуживания клиента

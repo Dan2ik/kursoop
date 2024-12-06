@@ -32,6 +32,8 @@ public class Habitat {
     private final List<Consultant> consultants;
 
     private final HelloController controller; // Ссылка на контроллер
+    private org.example.kurs.Bank Bank;
+    Bank bankInstance = new Bank();
 
     public Habitat(Pane pane, Circle centre, Circle entry, Circle consultant, Circle cash, Circle exit, int cashCount, int consultantCount, int maxQueueCash, int maxQueueCons, HelloController controller) {
         this.pane = pane;
@@ -48,12 +50,12 @@ public class Habitat {
 
         // Создание касс и консультантов
         for (int i = 0; i < cashCount; i++) {
-            this.cashRegisters.add(new CashRegister(i + 1, maxQueueCash, controller)); // Максимальная длина очереди
+            this.cashRegisters.add(new CashRegister(i + 1, maxQueueCash, controller, bankInstance)); // Максимальная длина очереди
             System.out.println(cashCount);
         }
 
         for (int i = 0; i < consultantCount; i++) {
-            this.consultants.add(new Consultant(i + 1, maxQueueCons, controller)); // Максимальная длина очереди
+            this.consultants.add(new Consultant(i + 1, maxQueueCons, controller, bankInstance)); // Максимальная длина очереди
         }
     }
 
@@ -202,11 +204,11 @@ public class Habitat {
 
         // Создание нового количества касс и консультантов
         for (int i = 0; i < cashCount; i++) {
-            this.cashRegisters.add(new CashRegister(i + 1, 5, controller)); // Максимальная длина очереди
+            this.cashRegisters.add(new CashRegister(i + 1, 5, controller, bankInstance)); // Максимальная длина очереди
         }
 
         for (int i = 0; i < consultantCount; i++) {
-            this.consultants.add(new Consultant(i + 1, 5, controller)); // Максимальная длина очереди
+            this.consultants.add(new Consultant(i + 1, 5, controller, bankInstance)); // Максимальная длина очереди
         }
     }
 
