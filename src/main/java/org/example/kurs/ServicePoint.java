@@ -54,6 +54,9 @@ public abstract class ServicePoint {
 
                 // Используем PauseTransition для имитации времени обслуживания
                 PauseTransition pause = new PauseTransition(Duration.seconds(serviceTime));
+                if (this instanceof Consultant) {
+                    controller.updateConsultantTable(id, queue.size());
+                }
                 controller.updateCashTable(id, queue.size());
                 pause.setOnFinished(e -> {
                     isBusy = false; // Освобождаем сервис
@@ -73,11 +76,11 @@ public abstract class ServicePoint {
             }
         }
     }
-    public static double getRandomValue() {
+    public double getRandomValue() {
         double min = 30;
         double max = 9000;
         // Generate a random value between min and max
-        return   Math.round((random.nextDouble() * (max - min) + min) * 100.0) / 100.0;
+        return   Math.round((random.nextDouble() * (max - min) + min)*((100- controller.getDiscount())/100) * 100.0) / 100.0;
     }
 
     public boolean isBusy() {

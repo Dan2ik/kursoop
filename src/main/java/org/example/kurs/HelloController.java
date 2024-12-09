@@ -35,11 +35,11 @@ public class HelloController {
     @FXML
     private CheckBox ad;
     @FXML
-    private CheckBox discount;
-    @FXML
     private Text CountAll;
     @FXML
-    private Text Money;
+    private Text Money, profit;
+    @FXML
+    private Text salary;
     @FXML
     private Text CountNotServed;
     @FXML
@@ -48,7 +48,7 @@ public class HelloController {
     private TableView<ServiceTableEntry> Consultantmatrix; // Таблица для консультантов
 
     @FXML
-    private Spinner<Integer> MaxQueueCash, MaxQueueCons, CountCash, CountConsultant, MinPeriod, MaxPeriod;
+    public Spinner<Integer> MaxQueueCash, MaxQueueCons, CountCash, CountConsultant, MinPeriod, MaxPeriod, discount;
 
     private Timeline customerGenerator;
     private final Random random = new Random();
@@ -66,13 +66,14 @@ public class HelloController {
     private Habitat habitat;
     private int CountCustomers;
     private int Ad, Discount;
+    private int CD=0;
+    private int oldcountdays=0;
 
 
     @FXML
     public void initialize() {
         schedule = new Schedule(IsSuper.isSelected());
         Ad = ad.isSelected() ? 1 : 0;
-        Discount = discount.isSelected() ? 1 : 0;
         // Обновляем метку каждую секунд
         // Настраиваем слайдер для управления скоростью
         speedSlider.setMin(0.1);  // Минимальная скорость (0.1x)
@@ -83,8 +84,7 @@ public class HelloController {
             clock.setSpeed(newValue.doubleValue());
         });
 
-        // Запускаем часы
-        clock.start();
+
         // Инициализация данных таблиц
         cashTableData = FXCollections.observableArrayList();
         consultantTableData = FXCollections.observableArrayList();
@@ -111,6 +111,7 @@ public class HelloController {
         Consultantmatrix.getColumns().addAll(consultantIdColumn, consultantQueueColumn);
 
         // Настройка Spinner
+        discount.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 100, 0));
         CountCash.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 10, 1));
         CountConsultant.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 10, 1));
         MinPeriod.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 30, 1));
@@ -125,8 +126,6 @@ public class HelloController {
                     System.out.println("День недели: "+ clock.getCurrentDay().getValue()+ "Час: "+clock.getHour().getHour());
 
                     if(schedule.isOpen(clock.getCurrentDay().getValue(), clock.getHour().getHour())) {
-
-
                         CountCustomers++;
                         CountAll.setText(String.valueOf(CountCustomers));
                         habitat.generateCustomer();
@@ -141,17 +140,37 @@ public class HelloController {
 
     // Запуск симуляции
     public void start(ActionEvent actionEvent) {
-        if(schedule.isOpen(clock.getCurrentDay().getValue(), clock.getHour().getHour())){
-        Timeline updateLabelTimeline = new Timeline(new KeyFrame(Duration.millis(100), e -> {
-            String timeText = clock.getCurrentTime();
-            String dayText = clock.getCurrentDay().toString();
-            timeLabel.setText("Время: " + timeText + " | День недели: " + dayText);
-        }));
-        updateLabelTimeline.setCycleCount(Timeline.INDEFINITE);
-        updateLabelTimeline.play();
-        // Инициализация Habitat
-        habitat = new Habitat(pane, centre, entry, consultant, cash, exit, CountCash.getValue(), CountConsultant.getValue(), MaxQueueCash.getValue(), MaxQueueCons.getValue(), this);
-        customerGenerator.play();
+        if (schedule.isOpen(clock.getCurrentDay().getValue(), clock.getHour().getHour())) {
+            // Запускаем часы
+            clock.start();
+            Timeline updateLabelTimeline = new Timeline(new KeyFrame(Duration.millis(100), e -> {
+                System.out.println(clock.getCurrentDay());
+                if (clock.getCountDays() != oldcountdays) {
+                    CD += 1500 * (CountCash.getValue() + CountConsultant.getValue());
+                    salary.setText(String.valueOf(CD));
+
+                    if (ad.isSelected()) {
+                        CD -= 7000;
+                    }
+
+                    // Извлечение числовой части из строки Money.getText()
+                    String moneyText = Money.getText();
+                    String moneyValueStr = moneyText.replaceAll("[^0-9.]", ""); // Удаление всех нечисловых символов
+                    double moneyValue = Double.parseDouble(moneyValueStr);
+                    double profitValue = (moneyValue / 100) * 9 - CD;
+                    profit.setText(String.valueOf(profitValue));
+
+                    oldcountdays = clock.getCountDays();
+                }
+                String timeText = clock.getCurrentTime();
+                String dayText = clock.getCurrentDay().toString();
+                timeLabel.setText("Время: " + timeText + " | День недели: " + dayText);
+            }));
+            updateLabelTimeline.setCycleCount(Timeline.INDEFINITE);
+            updateLabelTimeline.play();
+            // Инициализация Habitat
+            habitat = new Habitat(pane, centre, entry, consultant, cash, exit, CountCash.getValue(), CountConsultant.getValue(), MaxQueueCash.getValue(), MaxQueueCons.getValue(), this);
+            customerGenerator.play();
         }
     }
 
@@ -160,6 +179,7 @@ public class HelloController {
     }
     // Остановка симуляции
     public void stop(ActionEvent actionEvent) {
+        clock.stop();
         customerGenerator.stop();
     }
 
@@ -168,9 +188,7 @@ public class HelloController {
         customerGenerator.stop();
         customerGenerator = new Timeline(
                 new KeyFrame(Duration.seconds(getRandomPeriod()), e -> {
-
                         habitat.generateCustomer();
-
                 })
         );
         customerGenerator.setCycleCount(Timeline.INDEFINITE);
@@ -189,6 +207,52 @@ public class HelloController {
 
     public void updateSimulationParameters(MouseEvent mouseEvent) {
     }
+    // Метод сброса приложения до начального состояния
+    public void reset(ActionEvent actionEvent) {
+        // Остановка симуляции и таймера
+        if (clock != null) clock.stop();
+        if (customerGenerator != null) customerGenerator.stop();
+
+        // Сброс текстовых меток
+        CountAll.setText("0");
+        Money.setText("0");
+        profit.setText("0");
+        salary.setText("0");
+        CountNotServed.setText("0");
+        timeLabel.setText("Время: 08:00 | День недели: MONDAY");
+
+        // Сброс слайдера скорости
+        speedSlider.setValue(1.0);
+
+        // Сброс спиннеров к их начальному состоянию
+        discount.getValueFactory().setValue(0);
+        CountCash.getValueFactory().setValue(1);
+        CountConsultant.getValueFactory().setValue(1);
+        MinPeriod.getValueFactory().setValue(1);
+        MaxPeriod.getValueFactory().setValue(2);
+        MaxQueueCash.getValueFactory().setValue(1);
+        MaxQueueCons.getValueFactory().setValue(1);
+
+        // Очистка таблиц
+        cashTableData.clear();
+        consultantTableData.clear();
+
+        // Очистка других переменных
+        CountCustomers = 0;
+        Ad = 0;
+        Discount = 0;
+        CD = 0;
+        oldcountdays = 0;
+
+        // Сброс параметров Habitat и Schedule
+        habitat = null;
+        schedule = new Schedule(IsSuper.isSelected());
+
+        // Инициализация часов и таймера заново
+        clock = new Clock(LocalTime.of(8, 0, 0), DayOfWeek.MONDAY);
+        initialize(); // Перезапуск начальных настроек
+    }
+
 
     // Класс записи для таблицы
     public static class ServiceTableEntry {
@@ -243,5 +307,8 @@ public class HelloController {
     }
     public void updateMoney(String s){
         Money.setText(s);
+    }
+    public int getDiscount(){
+        return discount.getValue();
     }
 }

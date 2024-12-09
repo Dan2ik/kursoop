@@ -49,12 +49,9 @@ public class Bank {
         this.budget -= amount;
     }
 
-    public void salary(int a){
-        this.budget -= a*1500;
-    }
     @Override
     public String toString() {
-        return "Оборот :" + budget;
+        return String.valueOf(budget);
     }
 
 }
