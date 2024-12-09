@@ -1,6 +1,7 @@
 package org.example.kurs;
 
 import javafx.animation.KeyFrame;
+import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -115,27 +116,27 @@ public class HelloController {
         discount.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 100, 0));
         CountCash.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 10, 1));
         CountConsultant.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 10, 1));
-        MinPeriod.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 30, 1));
-        MaxPeriod.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(2, 60, 1));
+        MinPeriod.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 600000, 1));
+        MaxPeriod.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(2, 600000, 1));
         MaxQueueCons.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 10, 1));
         MaxQueueCash.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 10, 1));
 
 
         // Создание таймера для генерации покупателей
-        customerGenerator = new Timeline(
-                new KeyFrame(Duration.seconds(getRandomPeriod()*speedSlider.getValue()), e -> {
-                    System.out.println("День недели: "+ clock.getCurrentDay().getValue()+ "Час: "+clock.getHour().getHour());
 
-                    if(schedule.isOpen(clock.getCurrentDay().getValue(), clock.getHour().getHour())) {
+        customerGenerator = new Timeline(
+                new KeyFrame(Duration.seconds(getRandomPeriod()), e -> {
+                    if (schedule.isOpen(clock.getCurrentDay().getValue(), clock.getHour().getHour())) {
                         CountCustomers++;
                         CountAll.setText(String.valueOf(CountCustomers));
                         habitat.generateCustomer();
                     }
-
+                    restartCustomerGenerator(); // Перезапускаем генератор с новым интервалом
                 })
         );
-        customerGenerator.setCycleCount(Timeline.INDEFINITE);
-
+        customerGenerator.setCycleCount(1); // Устанавливаем один цикл для текущего интервала
+        customerGenerator.play();
+        customerGenerator.stop();
     }
 
 
