@@ -68,7 +68,7 @@ public class HelloController {
     private int Ad, Discount;
     private int CD=0;
     private int oldcountdays=0;
-
+    private boolean first=true;
 
     @FXML
     public void initialize() {
@@ -84,31 +84,32 @@ public class HelloController {
             clock.setSpeed(newValue.doubleValue());
         });
 
-
         // Инициализация данных таблиц
         cashTableData = FXCollections.observableArrayList();
         consultantTableData = FXCollections.observableArrayList();
 
         Cashmatrix.setItems(cashTableData);
         Consultantmatrix.setItems(consultantTableData);
+        if (first){
+            // Настройка таблицы для касс
+            TableColumn<ServiceTableEntry, Integer> cashIdColumn = new TableColumn<>("Номер кассы");
+            cashIdColumn.setCellValueFactory(new PropertyValueFactory<>("serviceId"));
 
-        // Настройка таблицы для касс
-        TableColumn<ServiceTableEntry, Integer> cashIdColumn = new TableColumn<>("Номер кассы");
-        cashIdColumn.setCellValueFactory(new PropertyValueFactory<>("serviceId"));
+            TableColumn<ServiceTableEntry, Integer> cashQueueColumn = new TableColumn<>("Очередь");
+            cashQueueColumn.setCellValueFactory(new PropertyValueFactory<>("queueSize"));
 
-        TableColumn<ServiceTableEntry, Integer> cashQueueColumn = new TableColumn<>("Очередь");
-        cashQueueColumn.setCellValueFactory(new PropertyValueFactory<>("queueSize"));
+            Cashmatrix.getColumns().addAll(cashIdColumn, cashQueueColumn);
 
-        Cashmatrix.getColumns().addAll(cashIdColumn, cashQueueColumn);
+            // Настройка таблицы для консультантов
+            TableColumn<ServiceTableEntry, Integer> consultantIdColumn = new TableColumn<>("Номер консультанта");
+            consultantIdColumn.setCellValueFactory(new PropertyValueFactory<>("serviceId"));
 
-        // Настройка таблицы для консультантов
-        TableColumn<ServiceTableEntry, Integer> consultantIdColumn = new TableColumn<>("Номер консультанта");
-        consultantIdColumn.setCellValueFactory(new PropertyValueFactory<>("serviceId"));
+            TableColumn<ServiceTableEntry, Integer> consultantQueueColumn = new TableColumn<>("Очередь");
+            consultantQueueColumn.setCellValueFactory(new PropertyValueFactory<>("queueSize"));
 
-        TableColumn<ServiceTableEntry, Integer> consultantQueueColumn = new TableColumn<>("Очередь");
-        consultantQueueColumn.setCellValueFactory(new PropertyValueFactory<>("queueSize"));
-
-        Consultantmatrix.getColumns().addAll(consultantIdColumn, consultantQueueColumn);
+            Consultantmatrix.getColumns().addAll(consultantIdColumn, consultantQueueColumn);
+            first=false;
+        }
 
         // Настройка Spinner
         discount.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 100, 0));
@@ -122,7 +123,7 @@ public class HelloController {
 
         // Создание таймера для генерации покупателей
         customerGenerator = new Timeline(
-                new KeyFrame(Duration.seconds(getRandomPeriod()), e -> {
+                new KeyFrame(Duration.seconds(getRandomPeriod()*speedSlider.getValue()), e -> {
                     System.out.println("День недели: "+ clock.getCurrentDay().getValue()+ "Час: "+clock.getHour().getHour());
 
                     if(schedule.isOpen(clock.getCurrentDay().getValue(), clock.getHour().getHour())) {
@@ -141,19 +142,15 @@ public class HelloController {
     // Запуск симуляции
     public void start(ActionEvent actionEvent) {
         if (schedule.isOpen(clock.getCurrentDay().getValue(), clock.getHour().getHour())) {
-            // Запускаем часы
             clock.start();
-            Timeline updateLabelTimeline = new Timeline(new KeyFrame(Duration.millis(100), e -> {
-                System.out.println(clock.getCurrentDay());
+            Timeline updateLabelTimeline = new Timeline(new KeyFrame(Duration.millis(100/speedSlider.getValue()), e -> {
+                System.out.println(clock.getCurrentTime());
                 if (clock.getCountDays() != oldcountdays) {
                     CD += 1500 * (CountCash.getValue() + CountConsultant.getValue());
                     salary.setText(String.valueOf(CD));
-
                     if (ad.isSelected()) {
                         CD -= 7000;
                     }
-
-                    // Извлечение числовой части из строки Money.getText()
                     String moneyText = Money.getText();
                     String moneyValueStr = moneyText.replaceAll("[^0-9.]", ""); // Удаление всех нечисловых символов
                     double moneyValue = Double.parseDouble(moneyValueStr);
@@ -210,8 +207,12 @@ public class HelloController {
     // Метод сброса приложения до начального состояния
     public void reset(ActionEvent actionEvent) {
         // Остановка симуляции и таймера
-        if (clock != null) clock.stop();
-        if (customerGenerator != null) customerGenerator.stop();
+        if (clock != null) {
+            clock.stop();
+        }
+        if (customerGenerator != null) {
+            customerGenerator.stop();
+        }
 
         // Сброс текстовых меток
         CountAll.setText("0");
@@ -243,7 +244,6 @@ public class HelloController {
         Discount = 0;
         CD = 0;
         oldcountdays = 0;
-
         // Сброс параметров Habitat и Schedule
         habitat = null;
         schedule = new Schedule(IsSuper.isSelected());
